@@ -10,10 +10,33 @@ int main()
         map.insert({i, i - 'a'});
     }
 
-    std::cout << map.containsKey('z') << std::endl;
-    std::cout << map.containsKey('A') << std::endl;
-    std::cout << map.containsValue(4) << std::endl;
-    std::cout << map.containsValue(-1) << std::endl;
+    for (int i = 'a'; i <= 'z'; ++i)
+    {
+        map.insert({i, 'a' - i});
+    }
+
+    std::vector<char> keys = map.keys();
+    for (int i = 0; i < keys.size(); ++i)
+    {
+        std::cout << keys[i] << ' ';
+    }
+    std::cout << std::endl;
+
+    std::vector<int> values = map.values();
+    
+    for (int i = 0; i < values.size(); ++i)
+    {
+        std::cout << values[i] << ' ';
+    }
+    std::cout << std::endl;
+
+    std::vector<std::pair<char, int> > pairs = map.pairs();
+    
+    for (int i = 0; i < pairs.size(); ++i)
+    {
+        std::cout << '{' << pairs[i].first << ", " << pairs[i].second << "} ";
+    }
+    std::cout << std::endl;
 
     return 0;
 }

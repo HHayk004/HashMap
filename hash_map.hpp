@@ -11,8 +11,21 @@ HashMap<T, U>::HashMap()
 template <typename T, typename U>
 void HashMap<T, U>::insert(std::pair<T, U> elem)
 {
-    size_t index = hash(elem.first);
+    size_t index = hash(elem.first, m_vec.size());
 
+    for (auto it = m_vec[index].second.begin(); it != m_vec[index].second.end(); ++it)
+    {
+        if (it->first == elem.first)
+        {
+            if (it->second != elem.second)
+            {
+                it->second = elem.second;
+            }
+
+            return;
+        }
+    }
+    
     m_vec[index].second.push_front(elem);
     ++m_vec[index].first;
 
@@ -23,16 +36,31 @@ void HashMap<T, U>::insert(std::pair<T, U> elem)
 }
 
 template <typename T, typename U>
+void HashMap<T, U>::erase(T key)
+{
+    size_t index = hash(key, m_vec.size());
+
+    for (auto it = m_vec[index].second.begin(); it != m_vec[index].second.end(); ++it)
+    {
+        if (it->first == key)
+        {
+            m_vec[index].second.erase(it);
+            break;
+        }
+    }
+}
+
+template <typename T, typename U>
 void HashMap<T, U>::rehash()
 {
-    std::vector<std::pair<size_t, std::forward_list<std::pair<T, U> > > > tmp;
+    std::vector<std::pair<size_t, std::list<std::pair<T, U> > > > tmp;
     tmp.resize(nextSize());
 
     for (int i = 0; i < m_vec.size(); ++i)
     {
         for (auto it = m_vec[i].second.begin(); it != m_vec[i].second.end(); ++it)
         {
-            size_t index = hash(it->first);
+            size_t index = hash(it->first, tmp.size());
 
             tmp[index].second.push_front(*it);
             ++tmp[index].first;
@@ -45,7 +73,7 @@ void HashMap<T, U>::rehash()
 template <typename T, typename U>
 U& HashMap<T, U>::get(T key)
 {
-    const size_t index = hash(key);
+    const size_t index = hash(key, m_vec.size());
 
     for (auto it = m_vec[index].second.begin(); it != m_vec[index].second.end(); ++it)
     {
@@ -57,6 +85,12 @@ U& HashMap<T, U>::get(T key)
 
     std::cerr << "The element doesn't exist!\n";
     exit(1);
+}
+
+template <typename T, typename U>
+void HashMap<T, U>::clear()
+{
+    m_vec.clear();
 }
 
 template <typename T, typename U>
@@ -90,13 +124,13 @@ size_t HashMap<T, U>::nextSize() const
 }
 
 template <typename T, typename U>
-size_t HashMap<T, U>::hash(T key) const
+size_t HashMap<T, U>::hash(T key, size_t size) const
 {
-    return static_cast<size_t>(key) % m_vec.size(); 
+    return static_cast<size_t>(key) % size; 
 }
 
 template <typename T, typename U>
-size_t HashMap<T, U>::hash(std::string str) const
+size_t HashMap<T, U>::hash(std::string str, size_t size) const
 {
     const size_t prime_const = 31; // can be any number
     size_t result = 0;
@@ -105,7 +139,7 @@ size_t HashMap<T, U>::hash(std::string str) const
         result += str[i] * pow(prime_const, i);
     }
 
-    return result % m_vec.size();
+    return result % size;
 }
 
 template <typename T, typename U>
@@ -127,11 +161,11 @@ bool HashMap<T, U>::empty() const
     {
         if (m_vec[i].first)
         {
-            return true;
+            return false;
         }
     }
  
-    return false;
+    return true;
 }
 
 template <typename T, typename U>
@@ -166,5 +200,50 @@ bool HashMap<T, U>::containsValue(U val) const
 
     return false;
 }
-    
+
+template <typename T, typename U>
+std::vector<T> HashMap<T, U>::keys() const
+{
+    std::vector<T> result;
+    for (int i = 0; i < m_vec.size(); ++i)
+    {
+        for (auto it = m_vec[i].second.begin(); it != m_vec[i].second.end(); ++it)
+        {
+            result.push_back(it->first);
+        }
+    }
+
+    return result;
+}
+
+template <typename T, typename U>
+std::vector<U> HashMap<T, U>::values() const
+{
+    std::vector<U> result;
+    for (int i = 0; i < m_vec.size(); ++i)
+    {
+        for (auto it = m_vec[i].second.begin(); it != m_vec[i].second.end(); ++it)
+        {
+            result.push_back(it->second);
+        }
+    }
+
+    return result;
+}
+
+template <typename T, typename U>
+std::vector<std::pair<T, U> > HashMap<T, U>::pairs() const
+{
+    std::vector<std::pair<T, U> > result;
+    for (int i = 0; i < m_vec.size(); ++i)
+    {
+        for (auto it = m_vec[i].second.begin(); it != m_vec[i].second.end(); ++it)
+        {
+            result.push_back(*it);
+        }
+    }
+
+    return result;
+}
+   
 #endif
