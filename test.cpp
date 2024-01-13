@@ -3,19 +3,16 @@
 
 int main()
 {
-    HashMap<char, int> map;
+    HashMap<std::string, int> map;
 
     for (int i = 'a'; i <= 'z'; ++i)
     {
-        map.insert({i, i - 'a'});
+        std::string str = "letter-";
+        str += i;
+        map.insert({str, i - 'a'});
     }
 
-    for (int i = 'a'; i <= 'z'; ++i)
-    {
-        map.insert({i, 'a' - i});
-    }
-
-    std::vector<char> keys = map.keys();
+    std::vector<std::string> keys = map.keys();
     for (int i = 0; i < keys.size(); ++i)
     {
         std::cout << keys[i] << ' ';
@@ -30,7 +27,7 @@ int main()
     }
     std::cout << std::endl;
 
-    std::vector<std::pair<char, int> > pairs = map.pairs();
+    std::vector<std::pair<std::string, int> > pairs = map.pairs();
     
     for (int i = 0; i < pairs.size(); ++i)
     {
